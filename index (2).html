@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>رمضان كريم 🌙</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Amiri&family=Cairo:wght@700&display=swap');
+
+:root{
+  --light:#9adcf7;
+  --dark:#3a8fb7;
+}
+
+body{
+  margin:0;
+  font-family: 'Cairo', sans-serif;
+  background: radial-gradient(circle at top,#bfefff,#6bbadf);
+  color:#033;
+  overflow-y:auto;
+}
+
+.lantern{
+  position:fixed;
+  top:15px;
+  left:15px;
+  font-size:80px;
+  animation:swing 3s ease-in-out infinite;
+  opacity:.35;
+}
+@keyframes swing{
+  0%,100%{transform:rotate(-5deg)}
+  50%{transform:rotate(5deg)}
+}
+
+.star{
+  position:fixed;
+  top:-10px;
+  color:white;
+  animation:fall linear infinite;
+  opacity:.7;
+  pointer-events:none;
+}
+@keyframes fall{to{transform:translateY(110vh)}}
+
+.container{
+  max-width:420px;
+  margin:15px auto;
+  padding:10px;
+  position:relative;
+  z-index:2;
+}
+
+.card{
+  background:rgba(255,255,255,.7);
+  border-radius:18px;
+  padding:15px;
+  margin-bottom:15px;
+  box-shadow:0 8px 20px rgba(0,0,0,.15);
+}
+
+h1,h2,p{
+  text-align:center;
+  margin:5px 0;
+}
+
+h1{
+  font-family:'Amiri', serif;
+  font-size:48px;
+  color:#ff5f5f;
+  text-shadow:2px 2px 5px rgba(0,0,0,0.2);
+}
+
+h2{
+  font-size:32px;
+  color:#3a8fb7;
+  text-shadow:1px 1px 3px rgba(0,0,0,0.2);
+}
+
+p{
+  font-size:20px;
+  color:#f4a261;
+  text-shadow:1px 1px 2px rgba(0,0,0,0.1);
+  line-height:1.5;
+}
+
+.counter{
+  text-align:center;
+  font-size:28px;
+}
+
+.zikr{
+  text-align:center;
+  font-size:20px;
+  margin-bottom:5px;
+}
+
+.center{
+  text-align:center;
+  font-weight:bold;
+}
+
+#countdown{
+  text-align:center;
+  font-size:24px;
+  font-weight:bold;
+  color:#ff5f5f;
+  margin-bottom:10px;
+}
+
+input{
+  width:80%;
+  padding:10px;
+  border-radius:12px;
+  border:1px solid var(--dark);
+  margin-bottom:5px;
+  display:block;
+  margin:auto;
+  text-align:center;
+}
+
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:15px;
+  background:var(--dark);
+  color:white;
+  font-size:17px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+/* ===== تنسيق مواقيت الصلاة ===== */
+#prayers{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.prayer-card{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:var(--light);
+  color:var(--dark);
+  padding:10px 15px;
+  border-radius:12px;
+  font-weight:bold;
+  font-size:18px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.1);
+}
+.prayer-card.highlight{
+  background:var(--dark);
+  color:white;
+}
+</style>
+</head>
+<body>
+
+<div class="lantern">🏮</div>
+
+<div class="container">
+
+<!-- التهنئة -->
+<div class="card" id="greeting-card">
+  <h1>🌙 رمضان كريم 🌙</h1>
+  <input type="text" id="name" placeholder="اكتب اسمك">
+  <h2 id="personal-name" style="margin-top:10px;"></h2>
+  <p id="duaa" style="display:none;">اللهم بارك لنا في رمضان وأعنا على صيامه وقيامه</p>
+  <p id="wish" style="display:none;">كل عام وأنتم بخير ✨</p>
+  <button onclick="showGreeting()" style="margin-top:10px;">اعرض التهنئة</button>
+  <button onclick="resetGreeting()" id="restart" style="display:none; margin-top:10px;">البدء من جديد</button>
+</div>
+
+<!-- العد التنازلي لرمضان -->
+<div class="card">
+  <h2>⏳ العد التنازلي لرمضان</h2>
+  <div id="countdown">جارٍ التحميل...</div>
+</div>
+
+<!-- مواقيت الصلاة -->
+<div class="card">
+  <h2>🕌 مواقيت الصلاة</h2>
+  <div id="prayers">جارٍ التحميل...</div>
+</div>
+
+<!-- السبحة -->
+<div class="card">
+  <h2>📿 السبحة الإلكترونية</h2>
+  <div class="zikr" id="zikr">سبحان الله</div>
+  <div class="counter" id="count">0 / 33</div>
+  <button onclick="tasbeeh()">سَبِّح 🤲</button>
+</div>
+
+</div>
+
+<script>
+// شرشاشيب
+for(let i=0;i<25;i++){
+  let s=document.createElement("div");
+  s.className="star";
+  s.innerText="✦";
+  s.style.left=Math.random()*100+"vw";
+  s.style.animationDuration=4+Math.random()*6+"s";
+  document.body.appendChild(s);
+}
+
+// عرض التهنئة
+function showGreeting(){
+  const name = document.getElementById("name").value.trim();
+  if(name===""){ alert("اكتب اسمك!"); return;}
+  document.getElementById("personal-name").innerText=name;
+  document.getElementById("duaa").style.display="block";
+  document.getElementById("wish").style.display="block";
+  document.getElementById("restart").style.display="block";
+}
+
+// إعادة البدء
+function resetGreeting(){
+  document.getElementById("name").value="";
+  document.getElementById("personal-name").innerText="";
+  document.getElementById("duaa").style.display="none";
+  document.getElementById("wish").style.display="none";
+  document.getElementById("restart").style.display="none";
+}
+
+// العد التنازلي
+function startCountdown(){
+  const ramadanDate = new Date("2026-02-19T00:00:00");
+  setInterval(()=>{
+    const now = new Date();
+    const diff = ramadanDate - now;
+    if(diff <0){ document.getElementById("countdown").innerText="رمضان بدأ!"; return; }
+    const days=Math.floor(diff/(1000*60*60*24));
+    const hours=Math.floor((diff/(1000*60*60))%24);
+    const minutes=Math.floor((diff/(1000*60))%60);
+    const seconds=Math.floor((diff/1000)%60);
+    document.getElementById("countdown").innerText=
+      `${days} يوم ${hours} ساعة ${minutes} دقيقة ${seconds} ثانية`;
+  },1000);
+}
+startCountdown();
+
+// السبحة
+const azkar=["سبحان الله","الحمد لله","لا إله إلا الله","الله أكبر"];
+let zi=0, c=0;
+function tasbeeh(){
+ c++;
+ if(c>33){c=1; zi=(zi+1)%azkar.length;}
+ document.getElementById("zikr").innerText=azkar[zi];
+ document.getElementById("count").innerText=c+" / 33";
+}
+
+// مواقيت الصلاة
+function to12(t){
+ let [h,m]=t.split(":");
+ let hInt=parseInt(h);
+ let ap=hInt>=12?"PM":"AM";
+ hInt=hInt%12||12;
+ return hInt+":"+m+" "+ap;
+}
+fetch("https://api.aladhan.com/v1/timingsByCity?city=Cairo&country=Egypt&method=5")
+.then(r=>r.json())
+.then(d=>{
+ const t=d.data.timings;
+ const names=[ ["الفجر",t.Fajr], ["الظهر",t.Dhuhr], ["العصر",t.Asr], ["المغرب",t.Maghrib], ["العشاء",t.Isha] ];
+ const now=new Date().toTimeString().slice(0,5);
+ let html="";
+ names.forEach(p=>{
+   let cls=p[1]>now?"highlight":"";
+   html+=`<div class="prayer-card ${cls}"><span>${p[0]}</span><span>${to12(p[1])}</span></div>`;
+ });
+ document.getElementById("prayers").innerHTML=html;
+});
+<!-- الجزء الخاص بمواقيت الصلاة -->
+// تحويل الوقت لـ 12 ساعة
+function to12(t){
+ let [h,m]=t.split(":");
+ let hInt=parseInt(h);
+ let ap=hInt>=12?"PM":"AM";
+ hInt=hInt%12||12;
+ return hInt+":"+m+" "+ap;
+}
+
+// دالة تحديث مواقيت الصلاة
+function updatePrayers(){
+ fetch("https://api.aladhan.com/v1/timingsByCity?city=Cairo&country=Egypt&method=5")
+ .then(r=>r.json())
+ .then(d=>{
+   const t=d.data.timings;
+   const names=[
+     ["الفجر",t.Fajr],
+     ["الظهر",t.Dhuhr],
+     ["العصر",t.Asr],
+     ["المغرب",t.Maghrib],
+     ["العشاء",t.Isha]
+   ];
+   const now=new Date().toTimeString().slice(0,5);
+   let html="";
+   names.forEach(p=>{
+     let cls=p[1]>now?"highlight":"";
+     html+=`<div class="prayer-card ${cls}"><span>${p[0]}</span><span>${to12(p[1])}</span></div>`;
+   });
+   document.getElementById("prayers").innerHTML=html;
+ });
+}
+
+// تحديث فور تحميل الصفحة
+updatePrayers();
+
+// حساب الوقت لبداية اليوم التالي لتحديث تلقائي عند منتصف الليل
+function scheduleNextUpdate(){
+  const now = new Date();
+  const nextMidnight = new Date();
+  nextMidnight.setHours(24,0,0,0); // بداية اليوم التالي
+  const msUntilMidnight = nextMidnight - now;
+  setTimeout(()=>{
+    updatePrayers();
+    scheduleNextUpdate(); // إعادة الجدولة لليوم التالي
+  }, msUntilMidnight);
+}
+scheduleNextUpdate();
+
+</script>
+</body>
+</html>
